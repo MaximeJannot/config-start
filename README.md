@@ -1,2 +1,5 @@
 # config-start
-Gulp + Bower
+Gulp (minification JS/CSS) + Bower
+
+#TODO
+- minification des images
