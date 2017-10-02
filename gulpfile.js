@@ -7,7 +7,7 @@ var uglify = require("gulp-uglify");
 
 // Variables de chemins
 var source = './_src'; // dossier de travail
-var destination = './_site/dist'; // dossier à livrer
+var destination = './dist'; // dossier à livrer
 
 // Tâche "build" = sass + autoprefixer + CSScomb + beautify (source -> destination)
 gulp.task('minify-css', function () {
