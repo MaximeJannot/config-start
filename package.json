@@ -1,6 +1,6 @@
 {
-  "name": "meltingbook",
-  "version": "0.1.0",
+  "name": "project",
+  "version": "1.0.0",
   "devDependencies": {
     "gulp": "latest",
     "gulp-autoprefixer": "latest",
@@ -10,6 +10,6 @@
     "gulp-load-plugins": "latest",
     "gulp-rename": "latest",
     "gulp-sass": "latest",
-    "gulp-uglify": "^2.1.2"
+    "gulp-uglify": "latest"
   }
 }
