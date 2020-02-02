@@ -1,39 +1,62 @@
 // Requis
-var gulp = require('gulp');
+var gulp = require("gulp"),
+    sass = require("gulp-sass"),
+    postcss = require("gulp-postcss"),
+    autoprefixer = require("autoprefixer"),
+    cssnano = require("cssnano");
+var browserSync = require("browser-sync").create();
 
-// Include plugins
-var plugins = require('gulp-load-plugins')(); // tous les plugins de package.json
-var uglify = require("gulp-uglify");
+// Put this after including our dependencies
+var paths = {
+    styles: {
+        // By using styles/**/*.sass we're telling gulp to check all folders for any sass file
+        src: "src/css/*.scss",
+        // Compiled files will end up in whichever folder it's found in (partials are not compiled)
+        dest: "dist/css"
+    }
+};
 
-// Variables de chemins
-var source = './_src'; // dossier de travail
-var destination = './dist'; // dossier à livrer
+function style() {
+    // Where should gulp look for the sass files?
+    // My .sass files are stored in the styles folder
+    // (If you want to use scss files, simply look for *.scss files instead)
+    return (
+        gulp
+            .src(paths.styles.src)
+            // Use sass with the files found, and log any errors
+            .pipe(sass())
+            .on("error", sass.logError)
+            // Use postcss with autoprefixer and compress the compiled file using cssnano
+            .pipe(postcss([autoprefixer(), cssnano()]))
+            // What is the destination for the compiled file?
+            .pipe(gulp.dest(paths.styles.dest))
+            // Add browsersync stream pipe after compilation
+            .pipe(browserSync.stream())
+    );
+}
+exports.style = style;
 
-// Tâche "build" = sass + autoprefixer + CSScomb + beautify (source -> destination)
-gulp.task('minify-css', function () {
-  return gulp.src(source + '/_css/style.scss')
-    .pipe(plugins.sass())
-    .pipe(plugins.csscomb())
-    .pipe(plugins.cssbeautify({indent: '  '}))
-    .pipe(plugins.autoprefixer())
-    .pipe(gulp.dest(source + '/css/'))
-    .pipe(plugins.rename({suffix: '.min'}))
-    .pipe(plugins.csso())
-    .pipe(gulp.dest(destination + '/css/'));
-});
-// task
-gulp.task('minify-js', function () {
-    gulp.src(source + '/_js/*.js') // path to your files
-    .pipe(uglify())
-    .pipe(plugins.rename({suffix: '.min'}))
-    .pipe(gulp.dest(destination + '/js/'));
-});
+function reload() {
+    browserSync.reload();
+    done();
+}
 
-// Tâche "watch" = je surveille *sass
-gulp.task('watch', function () {
-  gulp.watch(source + '/_css/*.scss', ['minify-css']);
-  gulp.watch(source + '/_js/*.js', ['minify-js']);
-});
-
-// Tâche par défaut
-gulp.task('default', ['minify-css', 'minify-js']);
+function watch(){
+    browserSync.init({
+    //     // You can tell browserSync to use this directory and serve it as a mini-server
+        server: {
+            baseDir: "./"
+        }
+    //     // If you are already serving your website locally using something like apache
+    //     // You can use the proxy setting to proxy that instead
+    //     // proxy: "yourlocal.dev"
+    });
+    // gulp.watch takes in the location of the files to watch for changes
+    // and the name of the function we want to run on change
+    gulp.watch(paths.styles.src, style);
+    // We should tell gulp which files to watch to trigger the reload
+    // This can be html or whatever you're using to develop your website
+    // Note -- you can obviously add the path to the Paths object
+    gulp.watch("*html", reload);
+}
+exports.watch = watch;
